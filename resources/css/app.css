@@ -221,6 +221,12 @@ body{
   margin-top:14px;
 }
 
+.error {
+  color: #f87171;        /* red like Tailwind danger */
+  font-size: 12px;
+  margin-top: 4px;
+}
+
 /* ---------- MOBILE ---------- */
 
 @media(max-width:440px){

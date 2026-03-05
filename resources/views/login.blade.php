@@ -29,12 +29,14 @@
     <div class="field">
       <label class="lbl" for="email">Email Address</label>
       <input id="email" class="inp" type="email" placeholder="you@example.com">
+      <div id="error-email" class="error"></div>
     </div>
 
     <!-- Password -->
     <div class="field">
       <label class="lbl" for="password">Password</label>
       <input id="password" class="inp" type="password" placeholder="Enter your password">
+      <div id="error-password" class="error"></div>
     </div>
 
     <!-- Login Button -->

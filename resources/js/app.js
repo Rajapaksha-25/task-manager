@@ -2,13 +2,18 @@ import './bootstrap';
 
 const API = "http://127.0.0.1:8000/api";
 
+// ---------- REGISTER ----------
 async function register() {
+    // Clear previous error messages
+    ["name","email","password","password_confirmation"].forEach(id=>{
+        const el = document.getElementById(`error-${id}`);
+        if(el) el.textContent="";
+    });
+
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const password_confirmation = document.getElementById("password_confirmation").value;
-
-    console.log("Register clicked:", {name, email, password, password_confirmation});
 
     const res = await fetch(API + "/register", {
         method: "POST",
@@ -16,27 +21,38 @@ async function register() {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({
-            name, email, password, password_confirmation
-        })
+        body: JSON.stringify({ name, email, password, password_confirmation })
     });
 
     const data = await res.json();
-    console.log("Response:", data);
 
     if (res.ok) {
         localStorage.setItem("token", data.access_token);
         window.location.href = "dashboard.php";
     } else {
-        alert(data.message || JSON.stringify(data));
+        // Display Laravel validation errors under each field
+        if (data.errors) {
+            for (const key in data.errors) {
+                const el = document.getElementById(`error-${key}`);
+                if (el) el.textContent = data.errors[key][0];
+            }
+        } else if (data.message) {
+            // fallback: show under password field
+            const el = document.getElementById("error-password");
+            if(el) el.textContent = data.message;
+        }
     }
 }
 
+// ---------- LOGIN ----------
 async function login() {
+    ["email","password"].forEach(id=>{
+        const el = document.getElementById(`error-${id}`);
+        if(el) el.textContent="";
+    });
+
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-
-    console.log("Login clicked:", {email, password});
 
     const res = await fetch(API + "/login", {
         method: "POST",
@@ -44,28 +60,36 @@ async function login() {
             "Content-Type": "application/json",
             "Accept": "application/json"
         },
-        body: JSON.stringify({email, password})
+        body: JSON.stringify({ email, password })
     });
 
     const data = await res.json();
-    console.log("Response:", data);
 
     if (res.ok) {
         localStorage.setItem("token", data.access_token);
         window.location.href = "dashboard.php";
     } else {
-        alert(data.message || JSON.stringify(data));
+        if (data.errors) {
+            for (const key in data.errors) {
+                const el = document.getElementById(`error-${key}`);
+                if (el) el.textContent = data.errors[key][0];
+            }
+        } else if (data.message) {
+            const el = document.getElementById("error-password");
+            if(el) el.textContent = data.message;
+        }
     }
 }
 
+// ---------- LOGOUT ----------
 function logout() {
     localStorage.removeItem("token");
     window.location.href = "login.php";
 }
 
+// ---------- AUTH CHECK ----------
 function checkAuth() {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!localStorage.getItem("token")) {
         window.location.href = "login.php";
     }
 }

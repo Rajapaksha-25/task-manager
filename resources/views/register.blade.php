@@ -28,13 +28,15 @@
     <!-- Full Name -->
     <div class="field">
       <label class="lbl" for="name">Full Name</label>
-      <input id="name" class="inp" type="text" placeholder="Pasindu Silva">
+      <input id="name" class="inp" type="text" placeholder="Full Name">
+      <div id="error-name" class="error" style="color:#f87171;font-size:12px;margin-top:4px;"></div>
     </div>
 
     <!-- Email -->
     <div class="field">
       <label class="lbl" for="email">Email Address</label>
       <input id="email" class="inp" type="email" placeholder="you@example.com">
+      <div id="error-email" class="error" style="color:#f87171;font-size:12px;margin-top:4px;"></div>
     </div>
 
     <!-- Passwords -->
@@ -42,11 +44,13 @@
       <div class="field">
         <label class="lbl" for="password">Password</label>
         <input id="password" class="inp" type="password" placeholder="Min 6 chars">
+        <div id="error-password" class="error" style="color:#f87171;font-size:12px;margin-top:4px;"></div>
       </div>
 
       <div class="field">
         <label class="lbl" for="password_confirmation">Confirm Password</label>
         <input id="password_confirmation" class="inp" type="password" placeholder="Repeat password">
+        <div id="error-password_confirmation" class="error" style="color:#f87171;font-size:12px;margin-top:4px;"></div>
       </div>
     </div>
 
