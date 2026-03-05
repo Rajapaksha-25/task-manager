@@ -43,7 +43,7 @@ class AuthController extends Controller
         $user = User::where('email',$request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)){
-            return response()->json(['massage'=>'Invalid credentials'],401);
+            return response()->json(['message'=>'Invalid credentials'],401);
         }
 
         $token = $user->createToken('auth_token')-> plainTextToken;
@@ -59,7 +59,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['massage'=>'logged out']);
+        return response()->json(['message'=>'logged out']);
     }    
     
 }
