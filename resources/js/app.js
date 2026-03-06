@@ -28,7 +28,7 @@ async function register() {
 
     if (res.ok) {
         localStorage.setItem("token", data.access_token);
-        window.location.href = "dashboard.php";
+        window.location.href = "/dashboard";
     } else {
         // Display Laravel validation errors under each field
         if (data.errors) {
@@ -67,7 +67,7 @@ async function login() {
 
     if (res.ok) {
         localStorage.setItem("token", data.access_token);
-        window.location.href = "dashboard.php";
+        window.location.href = "/dashboard";
     } else {
         if (data.errors) {
             for (const key in data.errors) {
@@ -84,13 +84,13 @@ async function login() {
 // ---------- LOGOUT ----------
 function logout() {
     localStorage.removeItem("token");
-    window.location.href = "login.php";
+    window.location.href = "/login";
 }
 
 // ---------- AUTH CHECK ----------
 function checkAuth() {
     if (!localStorage.getItem("token")) {
-        window.location.href = "login.php";
+        window.location.href = "/login";
     }
 }
 
