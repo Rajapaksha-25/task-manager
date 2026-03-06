@@ -2,7 +2,7 @@ import './bootstrap';
 
 const API = "http://127.0.0.1:8000/api";
 
-// ---------- REGISTER ----------
+// REGISTER 
 async function register() {
     ["name","email","password","password_confirmation"].forEach(id => {
         const el = document.getElementById(`error-${id}`);
@@ -38,7 +38,7 @@ async function register() {
     }
 }
 
-// ---------- LOGIN ----------
+// LOGIN 
 async function login() {
     ["email","password"].forEach(id => {
         const el = document.getElementById(`error-${id}`);
@@ -72,21 +72,21 @@ async function login() {
     }
 }
 
-// ---------- LOGOUT ----------
+//  LOGOUT 
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/login";
 }
 
-// ---------- AUTH CHECK ----------
+//  AUTH CHECK 
 function checkAuth() {
     if (!localStorage.getItem("token")) {
         window.location.href = "/login";
     }
 }
 
-// ========== DASHBOARD — Phase 1 ==========
+//  DASHBOARD 
 
 async function loadDashboard() {
     checkAuth();
@@ -97,20 +97,26 @@ async function loadDashboard() {
 }
 
 let currentPage = 1;
+let searchTimer = null;
 
 async function loadTasks(page = 1) {
-    currentPage  = page;
-    const token  = localStorage.getItem('token');
-    const list   = document.getElementById('task-list');
+    currentPage = page;
+    const token = localStorage.getItem('token');
+    const list  = document.getElementById('task-list');
     if (!list) return;
 
     list.innerHTML = `<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">Loading…</div>`;
 
-    const params = new URLSearchParams({ page, per_page: 10 });
-    const url    = `${API}/tasks?${params}`;
+    const params = new URLSearchParams({
+        page,
+        per_page: 10,
+        status:   document.getElementById('filter-status')?.value  || '',
+        priority: document.getElementById('filter-priority')?.value || '',
+        search:   document.getElementById('search')?.value          || '',
+    });
 
     try {
-        const res  = await fetch(url, {
+        const res  = await fetch(`${API}/tasks?${params}`, {
             headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
         });
         const data = await res.json();
@@ -228,7 +234,12 @@ async function submitTask() {
     }
 }
 
-// ---- HELPERS ----
+function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadTasks(1), 350);
+}
+
+//  HELPERS 
 function esc(str) {
     return String(str)
         .replace(/&/g,'&amp;')
@@ -244,7 +255,7 @@ function toast(msg, type = 'ok') {
     setTimeout(() => el.remove(), 3000);
 }
 
-// ---- EXPOSE TO WINDOW ----
+//  EXPOSE TO WINDOW 
 window.register       = register;
 window.login          = login;
 window.logout         = logout;
@@ -254,3 +265,4 @@ window.loadTasks      = loadTasks;
 window.openModal      = openModal;
 window.closeModal     = closeModal;
 window.submitTask     = submitTask;
+window.debounceSearch = debounceSearch;

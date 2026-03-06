@@ -26,9 +26,25 @@
   <!-- CONTENT -->
   <div class="dash-content">
 
-    <!-- NEW TASK BUTTON -->
-    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-      <button class="btn-add" onclick="openModal()">+ New Task</button>
+    <!-- TOOLBAR -->
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-search">
+        <input class="inp-sm" id="search" type="text"
+        placeholder="Search tasks…" oninput="debounceSearch()"/>
+      </div>
+      <select class="inp-sm" id="filter-status" onchange="loadTasks(1)" style="width:auto">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+      <select class="inp-sm" id="filter-priority" onchange="loadTasks(1)" style="width:auto">
+           <option value="">All Priorities</option>
+           <option value="low">Low</option>
+           <option value="medium">Medium</option>
+           <option value="high">High</option>
+       </select>
+       <button class="btn-add" onclick="openModal()">+ New Task</button>
     </div>
 
     <!-- TASK LIST -->
