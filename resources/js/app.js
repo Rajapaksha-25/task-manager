@@ -189,7 +189,7 @@ function renderTasks(tasks) {
                 <div class="task-meta-row">
                    <span class="badge ${sClass[t.status] || ''}">${sLabel[t.status] || t.status}</span>
                    <span class="badge ${pClass[t.priority] || ''}">${t.priority}</span>
-                   ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date}</span>` : ''}
+                   ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date < today && t.status !== 'completed' ? 'overdue: ' + t.due_date : t.due_date}</span>` : ''}
                 </div>
               </div>
               <div class="task-actions">${actions}</div>
