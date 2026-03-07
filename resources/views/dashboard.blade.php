@@ -26,7 +26,36 @@
   <!-- CONTENT -->
   <div class="dash-content">
 
-    <!-- TOOLBAR -->
+  <!-- stat cards -->
+    <div class="stats-row">
+      <div class="stat-card s-total">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-card s-pending">
+        <div class="stat-num" id="stat-pending">0</div>
+        <div class="stat-label">Pending</div>
+      </div>  
+      <div class="stat-card s-progress">
+        <div class="stat-num" id="stat-progress">0</div>
+        <div class="stat-label">Progress</div>
+      </div>  
+      <div class="stat-card s-done">
+        <div class="stat-num" id="stat-done">0</div>
+        <div class="stat-label">Completed</div>
+      </div> 
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div class="view-tabs">
+        <button class="tab-btn active" id="tab-active" onclick="switchView('active')">Active Task</button>
+        <button class="tab-btn" id="tab-trashed" onclick="switchView('trashed')"> Trash</button>
+      </div>  
+      <button class="btn-add" id="btn-new-task" onclick="openModal()">+ New Task</button>
+    </div>
+
+    <!-- TOOLBAR --> 
+   
     <div class="toolbar" id="toolbar">
       <div class="toolbar-search">
         <input class="inp-sm" id="search" type="text"
@@ -47,10 +76,9 @@
        <select class="inp-sm" id="sort" onchange="loadTasks(1)" style="width:auto">
           <option value="created_at|desc">Newest First</option>
           <option value="created_at|asc">Oldest First</option>
-          <option value="due_date|asc">Due Date ↑</option>
-          <option value="due_date|desc">Due Date ↓</option>
+          <option value="due_date|asc">Due Date Up</option>
+          <option value="due_date|desc">Due Date Down</option>
        </select>
-       <button class="btn-add" onclick="openModal()">+ New Task</button>
     </div>
 
     <!-- TASK LIST -->

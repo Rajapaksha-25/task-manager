@@ -94,11 +94,31 @@ async function loadDashboard() {
     const nameEl = document.getElementById('user-name');
     if (nameEl) nameEl.textContent = user.name || 'User';
     await loadTasks();
+    await loadStats();
+}
+ 
+async function loadStats() {
+    const token = localStorage.getItem('token');
+    try {
+        const [all, pen, inp, com] = await Promise.all([
+            fetch(`${API}/tasks?per_page=1`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }).then(r => r.json()),
+            fetch(`${API}/tasks?per_page=1&status=pending`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }).then(r => r.json()),
+            fetch(`${API}/tasks?per_page=1&status=in_progress`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }).then(r => r.json()),
+            fetch(`${API}/tasks?per_page=1&status=completed`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }).then(r => r.json()),
+        ]);
+        setText('stat-total',    all.total ?? 0);
+        setText('stat-pending',  pen.total ?? 0);
+        setText('stat-progress', inp.total ?? 0);
+        setText('stat-done',     com.total ?? 0);
+    } catch(e) {
+        console.error('Failed to load stats', e);
+    }
 }
 
 let currentPage = 1;
 let searchTimer = null;
-let editingId   = null; // tracks which task is being edited
+let editingId   = null; 
+let currentView = 'active';
 
 async function loadTasks(page = 1) {
     currentPage = page;
@@ -107,10 +127,13 @@ async function loadTasks(page = 1) {
     if (!list) return;
 
     list.innerHTML = `<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">Loading…</div>`;
-
-    const sort = (document.getElementById('sort')?.value || 'created_at|desc').split('|');
-
-    const params = new URLSearchParams({
+    
+    let url;
+    if (currentView === 'trashed'){
+        url = `${API}/tasks/trashed?page=${page}`;
+    } else {
+        const sort = (document.getElementById('sort')?.value || 'created_at|desc').split('|');
+        const params = new URLSearchParams({
         page,
         per_page: 10,
         status:   document.getElementById('filter-status')?.value  || '',
@@ -119,9 +142,11 @@ async function loadTasks(page = 1) {
         sort_by: sort[0],
         sort_dir: sort[1],
     });
+    url = `${API}/tasks?${params}`;
+    }
 
     try {
-        const res  = await fetch(`${API}/tasks?${params}`, {
+        const res  = await fetch(url, {
             headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
         });
         const data = await res.json();
@@ -140,9 +165,8 @@ function renderTasks(tasks) {
     const today = new Date().toISOString().split('T')[0];
     if (!tasks.length) {
         list.innerHTML = `<div class="empty-state">
-          <div class="empty-icon">✓</div>
-          <div class="empty-title">No tasks yet</div>
-          <div class="empty-sub">Click "+ New Task" to get started.</div>
+          <div class="empty-title">${currentView === 'trashed' ? 'Trash is empty' : 'No tasks yet'}</div>
+          <div class="empty-sub">${currentView === 'trashed' ? 'Deleted tasks will appear here.' : 'Click "+ New Task" to get started.'}</div>
         </div>`;
         return;
     }
@@ -151,23 +175,27 @@ function renderTasks(tasks) {
     const sClass = { pending: 'badge-pending', in_progress: 'badge-progress', completed: 'badge-done' };
     const pClass = { low: 'badge-low', medium: 'badge-medium', high: 'badge-high' };
 
-    list.innerHTML = tasks.map(t => `
-        <div class="task-item ${t.status === 'completed' ? 'done-item' : ''}">
-          <div class="task-body">
-            <div class="task-title-text">${esc(t.title)}</div>
-            <div class="task-meta-row">
-              <span class="badge ${sClass[t.status] || ''}">${sLabel[t.status] || t.status}</span>
-              <span class="badge ${pClass[t.priority] || ''}">${t.priority}</span>
-              ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date}</span>` : ''}
-            </div>
-          </div>
-          <div class="task-actions">
-            <button class="act-btn" onclick='openEditModal(${JSON.stringify(t)})'>Edit</button>
-            <button class="act-btn danger" onclick="deleteTask(${(t.id)})">Delete</button>
-          </div>
-        </div>
+    list.innerHTML = tasks.map(t => {
+        const actions = currentView === 'trashed'
+            ? `<button class="act-btn" onclick="restoreTask(${t.id})">Restore</button>
+               <button class="act-btn danger" onclick="forceDeleteTask(${t.id})">Delete</button>`
+            : `<button class="act-btn" onclick='openEditModal(${JSON.stringify(t)})'>Edit</button>
+               <button class="act-btn danger" onclick="deleteTask(${t.id})">Delete</button>`;
 
-    `).join('');
+        return `
+            <div class="task-item ${t.status === 'completed' ? 'done-item' : ''}">
+              <div class="task-body">
+                <div class="task-title-text">${esc(t.title)}</div>
+                <div class="task-meta-row">
+                   <span class="badge ${sClass[t.status] || ''}">${sLabel[t.status] || t.status}</span>
+                   <span class="badge ${pClass[t.priority] || ''}">${t.priority}</span>
+                   ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date}</span>` : ''}
+                </div>
+              </div>
+              <div class="task-actions">${actions}</div>
+            </div>
+         `;
+    }).join('');
 }
 
 function renderPagination(data) {
@@ -176,7 +204,7 @@ function renderPagination(data) {
     if (!data.last_page || data.last_page <= 1) { wrap.innerHTML = ''; return; }
 
     let html = `<button class="pg-btn" onclick="loadTasks(${data.current_page - 1})"
-        ${data.current_page <= 1 ? 'disabled' : ''}>‹</button>`;
+        ${data.current_page <= 1 ? 'disabled' : ''}>&#8249</button>`;
 
     for (let i = 1; i <= data.last_page; i++) {
         if (i === 1 || i === data.last_page || Math.abs(i - data.current_page) <= 1)
@@ -187,9 +215,22 @@ function renderPagination(data) {
     }
 
     html += `<button class="pg-btn" onclick="loadTasks(${data.current_page + 1})"
-        ${data.current_page >= data.last_page ? 'disabled' : ''}>›</button>`;
+        ${data.current_page >= data.last_page ? 'disabled' : ''}>&#8249</button>`;
     html += `<span class="pg-info">${data.from}–${data.to} of ${data.total}</span>`;
     wrap.innerHTML = html;
+}
+
+function switchView(view) {
+    currentView = view;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${view}`)?.classList.add('active');
+
+    const toolbar     = document.getElementById('toolbar');
+    const btnNewTask  = document.getElementById('btn-new-task');
+    if (toolbar)    toolbar.style.display    = view === 'active' ? 'flex' : 'none';
+    if (btnNewTask) btnNewTask.style.display = view === 'active' ? ''     : 'none';
+
+    loadTasks(1);
 }
 
 // ---- MODAL ----
@@ -276,12 +317,41 @@ async function deleteTask(id) {
     }
 }
 
+async function restoreTask(id) {
+    const token = localStorage.getItem('token');
+    try {
+        await fetch(`${API}/tasks/${id}/restore`, {
+            method:  'PATCH',
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+        });
+        toast('Task restored.', 'ok');
+        loadTasks(currentPage);
+        loadStats();
+    } catch(e) {
+        toast('Failed to restore.', 'err');
+    }
+}
+
+async function forceDeleteTask(id) {
+    if (!confirm('Permanently delete this task? This cannot be undone.')) return;
+    const token = localStorage.getItem('token');
+    try {
+        await fetch(`${API}/tasks/${id}/force`, {
+            method:  'DELETE',
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+        });
+        toast('Task permanently deleted.', 'ok');
+        loadTasks(currentPage);
+    } catch(e) {
+        toast('Failed to delete.', 'err');
+    }
+}
+
 function debounceSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadTasks(1), 350);
 }
 
-//  HELPERS 
 function esc(str) {
     return String(str)
         .replace(/&/g,'&amp;')
@@ -289,10 +359,15 @@ function esc(str) {
         .replace(/>/g,'&gt;');
 }
 
+function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+}
+
 function toast(msg, type = 'ok') {
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.innerHTML = `<span>${type === 'ok' ? '✓' : '✕'}</span> ${msg}`;
+    el.innerHTML = `<span>${type === 'ok' ? 'Done' : 'Error'}</span> ${msg}`;
     document.body.appendChild(el);
     setTimeout(() => el.remove(), 3000);
 }
@@ -304,9 +379,14 @@ window.logout         = logout;
 window.checkAuth      = checkAuth;
 window.loadDashboard  = loadDashboard;
 window.loadTasks      = loadTasks;
+window.switchView      = switchView;
 window.openModal      = openModal;
+window.openEditModal   = openEditModal;
 window.closeModal     = closeModal;
 window.submitTask     = submitTask;
 window.debounceSearch = debounceSearch;
-window.openEditModal = openEditModal;
-window.deleteTask    = deleteTask;
+window.openEditModal  = openEditModal;
+window.deleteTask     = deleteTask;
+window.restoreTask     = restoreTask;
+window.forceDeleteTask = forceDeleteTask;
+
