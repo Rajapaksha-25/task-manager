@@ -493,6 +493,11 @@ body{
   box-shadow: 0 0 0 3px rgba(129,140,248,.12);
 }
 
+.inp-sm option {
+  background: #1e2235;
+  color: var(--text);
+}
+
 select.inp-sm { cursor: pointer; }
 
 .task-due { font-size: 11px; color: var(--muted);}
@@ -595,6 +600,7 @@ select.inp-sm { cursor: pointer; }
 @media(max-width:640px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
 }
+
 
 /* MOBILE */
 @media(max-width:640px) {
