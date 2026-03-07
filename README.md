@@ -104,4 +104,76 @@ DELETE /api/tasks/{id}/force        Permanently delete a task      Yes
 
 ## Environment Variables
 
-See .env.example for all required variables and descriptions.
+## Environment Variables
+
+These are all the environment variables used in this project. Copy `.env.example` to `.env` and fill them in before running the app.
+
+### Application
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=                        
+APP_DEBUG=true                  
+APP_URL=http://localhost
+
+### Localization
+
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+
+### Database
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=taskapi
+DB_USERNAME=root
+DB_PASSWORD=                    
+
+### Session and Cache
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+CACHE_STORE=database
+
+### Queue
+
+QUEUE_CONNECTION=database
+
+### Security
+
+BCRYPT_ROUNDS=12
+
+### Logging
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_LEVEL=debug
+
+### Mail
+
+MAIL_MAILER=log
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+### Redis
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+### Broadcasting and Filesystem
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+
+### Frontend
+
+VITE_APP_NAME="${APP_NAME}"
