@@ -10,7 +10,7 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/* ---------- GLOBAL RESET ---------- */
+/*  GLOBAL RESET  */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -18,7 +18,7 @@
   padding: 0;
 }
 
-/* ---------- THEME ---------- */
+/*  THEME  */
 
 :root{
   --bg:#0f172a;
@@ -30,7 +30,7 @@
   --border:rgba(255,255,255,.12);
 }
 
-/* ---------- BODY ---------- */
+/*  BODY  */
 
 body{
   font-family:'Plus Jakarta Sans',sans-serif;
@@ -38,7 +38,7 @@ body{
   color:var(--text);
 }
 
-/* ---------- PAGE LAYOUT ---------- */
+/*  PAGE LAYOUT  */
 
 .page{
   min-height:100vh;
@@ -48,7 +48,7 @@ body{
   padding:28px 24px;
 }
 
-/* ---------- CARD ---------- */
+/*  CARD  */
 
 .card{
 
@@ -76,7 +76,7 @@ body{
   to{opacity:1;transform:translateY(0)}
 }
 
-/* ---------- LOGO ---------- */
+/*  LOGO  */
 
 .logo{
   display:flex;
@@ -101,7 +101,7 @@ body{
   font-weight:700;
 }
 
-/* ---------- TEXT ---------- */
+/*  TEXT  */
 
 .title{
   font-size:22px;
@@ -121,7 +121,7 @@ body{
   font-weight:600;
 }
 
-/* ---------- INPUTS ---------- */
+/*  INPUTS  */
 
 .field{ margin-bottom:14px }
 
@@ -167,7 +167,7 @@ body{
   box-shadow:0 0 0 3px rgba(129,140,248,.12);
 }
 
-/* ---------- PASSWORD GRID ---------- */
+/*  PASSWORD GRID  */
 
 .field-row{
   display:grid;
@@ -175,7 +175,7 @@ body{
   gap:12px;
 }
 
-/* ---------- BUTTON ---------- */
+/*  BUTTON  */
 
 .btn{
 
@@ -212,7 +212,7 @@ body{
   transform:translateY(0);
 }
 
-/* ---------- FOOT TEXT ---------- */
+/*  FOOT TEXT  */
 
 .terms{
   font-size:12px;
@@ -222,7 +222,7 @@ body{
 }
 
 .error {
-  color: #f87171;        /* red like Tailwind danger */
+  color: #f87171;       
   font-size: 12px;
   margin-top: 4px;
 }
@@ -494,6 +494,9 @@ body{
 }
 
 select.inp-sm { cursor: pointer; }
+
+.task-due { font-size: 11px; color: var(--muted);}
+.task-due.overdue {color: #f87171;}
 
 /* MOBILE */
 @media(max-width:640px) {

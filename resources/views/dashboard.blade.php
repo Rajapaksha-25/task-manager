@@ -44,11 +44,18 @@
            <option value="medium">Medium</option>
            <option value="high">High</option>
        </select>
+       <select class="inp-sm" id="sort" onchange="loadTasks(1)" style="width:auto">
+          <option value="created_at|desc">Newest First</option>
+          <option value="created_at|asc">Oldest First</option>
+          <option value="due_date|asc">Due Date ↑</option>
+          <option value="due_date|desc">Due Date ↓</option>
+       </select>
        <button class="btn-add" onclick="openModal()">+ New Task</button>
     </div>
 
     <!-- TASK LIST -->
     <div class="task-list" id="task-list"></div>
+    
 
     <!-- PAGINATION -->
     <div class="pagination" id="pagination"></div>

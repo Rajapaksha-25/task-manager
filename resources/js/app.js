@@ -107,12 +107,16 @@ async function loadTasks(page = 1) {
 
     list.innerHTML = `<div style="padding:30px;text-align:center;color:var(--muted);font-size:13px">Loading…</div>`;
 
+    const sort = (document.getElementById('sort')?.value || 'created_at|desc').split('|');
+
     const params = new URLSearchParams({
         page,
         per_page: 10,
         status:   document.getElementById('filter-status')?.value  || '',
         priority: document.getElementById('filter-priority')?.value || '',
         search:   document.getElementById('search')?.value          || '',
+        sort_by: sort[0],
+        sort_dir: sort[1],
     });
 
     try {
@@ -124,7 +128,6 @@ async function loadTasks(page = 1) {
         renderPagination(data);
     } catch(e) {
         list.innerHTML = `<div class="empty-state">
-          <div class="empty-icon">⚠</div>
           <div class="empty-title">Failed to load</div>
           <div class="empty-sub">Check your connection.</div>
         </div>`;
@@ -133,6 +136,7 @@ async function loadTasks(page = 1) {
 
 function renderTasks(tasks) {
     const list = document.getElementById('task-list');
+    const today = new Date().toISOString().split('T')[0];
     if (!tasks.length) {
         list.innerHTML = `<div class="empty-state">
           <div class="empty-icon">✓</div>
@@ -153,7 +157,7 @@ function renderTasks(tasks) {
             <div class="task-meta-row">
               <span class="badge ${sClass[t.status] || ''}">${sLabel[t.status] || t.status}</span>
               <span class="badge ${pClass[t.priority] || ''}">${t.priority}</span>
-              ${t.due_date ? `<span class="task-due">${t.due_date}</span>` : ''}
+              ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date}</span>` : ''}
             </div>
           </div>
         </div>
