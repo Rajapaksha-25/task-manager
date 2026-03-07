@@ -185,7 +185,7 @@ function renderTasks(tasks) {
         return `
             <div class="task-item ${t.status === 'completed' ? 'done-item' : ''}">
               <div class="task-body">
-                <div class="task-title-text">${esc(t.title)}</div>
+                <div class="task-title-text" onclick='openViewModal(${JSON.stringify(t)})' style="cursor:pointer">${esc(t.title)}</div>
                 <div class="task-meta-row">
                    <span class="badge ${sClass[t.status] || ''}">${sLabel[t.status] || t.status}</span>
                    <span class="badge ${pClass[t.priority] || ''}">${t.priority}</span>
@@ -347,6 +347,32 @@ async function forceDeleteTask(id) {
     }
 }
 
+function openViewModal(task) {
+    const sLabel = { pending: 'Pending', in_progress: 'In Progress', completed: 'Done' };
+    const pLabel = { low: 'Low', medium: 'Medium', high: 'High' };
+    const sClass = { pending: 'badge-pending', in_progress: 'badge-progress', completed: 'badge-done' };
+    const pClass = { low: 'badge-low', medium: 'badge-medium', high: 'badge-high' };
+
+    document.getElementById('view-title').textContent    = task.title;
+    document.getElementById('view-desc').textContent     = task.description || 'No description added.';
+    document.getElementById('view-due').textContent      = task.due_date    || 'No due date set.';
+    document.getElementById('view-created').textContent  = task.created_at  ? task.created_at.split('T')[0] : '-';
+
+    document.getElementById('view-status').innerHTML   = `<span class="badge ${sClass[task.status] || ''}">${sLabel[task.status] || task.status}</span>`;
+    document.getElementById('view-priority').innerHTML = `<span class="badge ${pClass[task.priority] || ''}">${pLabel[task.priority] || task.priority}</span>`;
+
+    document.getElementById('view-edit-btn').onclick = () => {
+        closeViewModal();
+        openEditModal(task);
+    };
+
+    document.getElementById('view-modal').style.display = 'flex';
+}
+
+function closeViewModal() {
+    document.getElementById('view-modal').style.display = 'none';
+}
+
 function debounceSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => loadTasks(1), 350);
@@ -389,4 +415,7 @@ window.openEditModal  = openEditModal;
 window.deleteTask     = deleteTask;
 window.restoreTask     = restoreTask;
 window.forceDeleteTask = forceDeleteTask;
+window.openViewModal  = openViewModal;
+window.closeViewModal = closeViewModal;
+window.loadStats = loadStats;
 

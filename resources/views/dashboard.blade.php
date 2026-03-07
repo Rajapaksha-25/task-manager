@@ -138,6 +138,47 @@
   </div>
 </div>
 
+<!-- VIEW TASK MODAL -->
+<div class="modal-overlay" id="view-modal" style="display:none" onclick="if(event.target===this)closeViewModal()">
+  <div class="view-modal-box">
+    <button class="modal-close" onclick="closeViewModal()">x</button>
+    <div class="modal-title" id="view-title"></div>
+    <hr class="view-divider">
+
+    <div class="view-field">
+      <div class="view-field-label">Description</div>
+      <div class="view-field-value" id="view-desc">-</div>
+    </div>
+
+    <div class="field-row">
+      <div class="view-field">
+        <div class="view-field-label">Status</div>
+        <div class="view-field-value" id="view-status"></div>
+      </div>
+      <div class="view-field">
+        <div class="view-field-label">Priority</div>
+        <div class="view-field-value" id="view-priority"></div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="view-field">
+        <div class="view-field-label">Due Date</div>
+        <div class="view-field-value" id="view-due">-</div>
+      </div>
+      <div class="view-field">
+        <div class="view-field-label">Created</div>
+        <div class="view-field-value" id="view-created"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeViewModal()">Close</button>
+      <button class="btn" id="view-edit-btn" onclick="" style="margin-top:0">Edit</button>
+    </div>
+  </div>
+</div>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
