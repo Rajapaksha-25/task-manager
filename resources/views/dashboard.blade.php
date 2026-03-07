@@ -55,7 +55,6 @@
 
     <!-- TASK LIST -->
     <div class="task-list" id="task-list"></div>
-    
 
     <!-- PAGINATION -->
     <div class="pagination" id="pagination"></div>
@@ -67,7 +66,7 @@
 <div class="modal-overlay" id="task-modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">New Task</div>
+    <div class="modal-title" id="modal-title">New Task</div>
     <div class="error" id="modal-err" style="margin-bottom:12px"></div>
 
     <div class="field">

@@ -98,6 +98,7 @@ async function loadDashboard() {
 
 let currentPage = 1;
 let searchTimer = null;
+let editingId   = null; // tracks which task is being edited
 
 async function loadTasks(page = 1) {
     currentPage = page;
@@ -160,7 +161,12 @@ function renderTasks(tasks) {
               ${t.due_date ? `<span class="task-due ${t.due_date < today && t.status !== 'completed' ? 'overdue' : ''}">${t.due_date}</span>` : ''}
             </div>
           </div>
+          <div class="task-actions">
+            <button class="act-btn" onclick='openEditModal(${JSON.stringify(t)})'>Edit</button>
+            <button class="act-btn danger" onclick="deleteTask(${(t.id)})">Delete</button>
+          </div>
         </div>
+
     `).join('');
 }
 
@@ -188,12 +194,28 @@ function renderPagination(data) {
 
 // ---- MODAL ----
 function openModal() {
+    editingId = null;
+    document.getElementById('modal-title').textContent  = 'New Task';
+    document.getElementById('modal-submit').textContent = 'Create Task';
     document.getElementById('m-title').value        = '';
     document.getElementById('m-desc').value         = '';
     document.getElementById('m-status').value       = 'pending';
     document.getElementById('m-priority').value     = 'medium';
     document.getElementById('m-due').value          = '';
     document.getElementById('modal-err').textContent = '';
+    document.getElementById('task-modal').style.display = 'flex';
+}
+
+function openEditModal(task) {
+    editingId = task.id;
+    document.getElementById('modal-title').textContent  = 'Edit Task';
+    document.getElementById('modal-submit').textContent = 'Save Changes';
+    document.getElementById('m-title').value            = task.title       || '';
+    document.getElementById('m-desc').value             = task.description || '';
+    document.getElementById('m-status').value           = task.status      || 'pending';
+    document.getElementById('m-priority').value         = task.priority    || 'medium';
+    document.getElementById('m-due').value              = task.due_date    || '';
+    document.getElementById('modal-err').textContent    = '';
     document.getElementById('task-modal').style.display = 'flex';
 }
 
@@ -221,20 +243,36 @@ async function submitTask() {
     btn.disabled = true; btn.textContent = 'Saving…';
 
     try {
-        const res  = await fetch(`${API}/tasks`, {
-            method:  'POST',
+        const res  = await fetch(editingId ? `${API}/tasks/${editingId}` : `${API}/tasks`, {
+            method: editingId ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${token}` },
             body:    JSON.stringify(body),
         });
         const data = await res.json();
         if (!res.ok) { errEl.textContent = data.message || 'Failed.'; return; }
         closeModal();
-        toast('Task created!', 'ok');
+        toast(editingId ? 'Task updated.' : 'Task created!', 'ok');
         loadTasks(currentPage);
     } catch(e) {
         errEl.textContent = 'Connection error.';
     } finally {
         btn.disabled = false; btn.textContent = orig;
+    }
+}
+
+async function deleteTask(id) {
+    if (!confirm('Move this task to trash?')) return;
+    const token = localStorage.getItem('token');
+
+    try {
+        await fetch(`${API}/tasks/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+        });
+        toast('Task moved to trash.', 'ok');
+        loadTasks(currentPage);
+    } catch(e) {
+        toast('Failed to delete task.', 'err');
     }
 }
 
@@ -270,3 +308,5 @@ window.openModal      = openModal;
 window.closeModal     = closeModal;
 window.submitTask     = submitTask;
 window.debounceSearch = debounceSearch;
+window.openEditModal = openEditModal;
+window.deleteTask    = deleteTask;
